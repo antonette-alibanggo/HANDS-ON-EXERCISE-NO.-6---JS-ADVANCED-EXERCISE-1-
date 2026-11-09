@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Javascript Web Output #1</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px 5.5%;
+            background-color: white;
+        }
+
+        h2 {
+            font-size: 25px;
+            margin-bottom: 18px;
+        }
+
+        input {
+            padding: 5px;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 2px 8px;
+            margin: 2px;
+        }
+
+        fieldset {
+            margin-top: 15px;
+            min-height: 120px;
+        }
+
+        #numberList {
+            list-style: none;
+            padding-left: 0;
+            margin-top: 5px;
+        }
+
+        #numberList li {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 3px;
+        }
+
+        .number {
+            width: 35px;
+        }
+
+        .odd {
+            color: blue;
+            font-weight: bold;
+            width: 35px;
+        }
+
+        .even {
+            color: green;
+            font-weight: bold;
+            width: 35px;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Javascript Web Output #1</h2>
+
+    <label>Insert any Positive Numbers:</label>
+    <input type="number" id="numberInput" min="1">
+
+    <br>
+
+    <button onclick="insertNumber()">Insert</button>
+    <button onclick="clearEntry()">Clear Entry</button>
+
+    <fieldset>
+        <legend>Inserted Numbers</legend>
+
+        <ul id="numberList"></ul>
+    </fieldset>
+
+    <br>
+
+    <button onclick="clearItems()">Clear Items</button>
+
+    <button onclick="getTotal()">Get Total</button>
+
+    <button onclick="identifyNumbers()">
+        Identify Highest and Lowest Number
+    </button>
+
+    <label>Sort by:</label>
+
+    <select id="sortOrder" onchange="sortNumbers()">
+        <option value="">Please select</option>
+        <option value="ascending">Ascending</option>
+        <option value="descending">Descending</option>
+    </select>
+
+    <div id="result"></div>
+
+
+    <script>
+
+        // Array to store inserted numbers
+        let numbers = [];
+
+
+        // INSERT NUMBER
+        function insertNumber() {
+
+            let input = document.getElementById("numberInput");
+            let value = input.value;
+
+            if (value === "" || Number(value) <= 0 ||
+                !Number.isInteger(Number(value))) {
+
+                alert("Please enter a valid positive whole number!");
+                return;
+            }
+
+            numbers.push(Number(value));
+
+            displayNumbers();
+
+            input.value = "";
+            input.focus();
+
+            document.getElementById("result").innerHTML = "";
+        }
+
+
+        // DISPLAY NUMBERS
+        function displayNumbers() {
+
+            let list = document.getElementById("numberList");
+
+            list.innerHTML = "";
+
+            numbers.forEach((num, index) => {
+
+                let li = document.createElement("li");
+
+                let numberSpan = document.createElement("span");
+                numberSpan.className = "number";
+                numberSpan.textContent = num;
+
+                let paritySpan = document.createElement("span");
+
+                if (num % 2 === 0) {
+                    paritySpan.textContent = "EVEN";
+                    paritySpan.className = "even";
+                } else {
+                    paritySpan.textContent = "ODD";
+                    paritySpan.className = "odd";
+                }
+
+                // REMOVE BUTTON
+                let removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+
+                removeButton.onclick = function() {
+                    removeNumber(index);
+                };
+
+                // EDIT BUTTON
+                let editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+
+                editButton.onclick = function() {
+                    editNumber(index);
+                };
+
+                li.appendChild(numberSpan);
+                li.appendChild(paritySpan);
+                li.appendChild(removeButton);
+                li.appendChild(editButton);
+
+                list.appendChild(li);
+
+            });
+        }
+
+
+        // REMOVE NUMBER
+        function removeNumber(index) {
+
+            numbers.splice(index, 1);
+
+            displayNumbers();
+
+            document.getElementById("result").innerHTML = "";
+        }
+
+
+        // EDIT NUMBER
+        function editNumber(index) {
+
+            let newNumber = prompt(
+                "Enter the new positive number:",
+                numbers[index]
+            );
+
+            if (newNumber === null) {
+                return;
+            }
+
+            newNumber = Number(newNumber);
+
+            if (newNumber <= 0 || !Number.isInteger(newNumber)) {
+                alert("Please enter a valid positive whole number!");
+                return;
+            }
+
+            numbers[index] = newNumber;
+
+            displayNumbers();
+
+            document.getElementById("result").innerHTML = "";
+        }
+
+
+        // CLEAR ENTRY
+        function clearEntry() {
+
+            document.getElementById("numberInput").value = "";
+
+            document.getElementById("numberInput").focus();
+        }
+
+
+        // CLEAR ALL ITEMS
+        function clearItems() {
+
+            numbers = [];
+
+            displayNumbers();
+
+            document.getElementById("result").innerHTML = "";
+
+            document.getElementById("sortOrder").value = "";
+        }
+
+
+        // GET TOTAL
+        function getTotal() {
+
+            if (numbers.length === 0) {
+                alert("No numbers inserted!");
+                return;
+            }
+
+            let total = numbers.reduce((sum, num) => sum + num, 0);
+
+            document.getElementById("result").innerHTML =
+                "Total: " + total;
+        }
+
+
+        // IDENTIFY HIGHEST AND LOWEST
+        function identifyNumbers() {
+
+            if (numbers.length === 0) {
+                alert("No numbers inserted!");
+                return;
+            }
+
+            let highest = Math.max(...numbers);
+            let lowest = Math.min(...numbers);
+
+            document.getElementById("result").innerHTML =
+                "Highest Number: " + highest +
+                "<br>Lowest Number: " + lowest;
+        }
+
+
+        // SORT NUMBERS
+        function sortNumbers() {
+
+            let order = document.getElementById("sortOrder").value;
+
+            if (order === "") {
+                return;
+            }
+
+            if (order === "ascending") {
+
+                numbers.sort((a, b) => a - b);
+
+            } else if (order === "descending") {
+
+                numbers.sort((a, b) => b - a);
+
+            }
+
+            displayNumbers();
+        }
+
+    </script>
+
+</body>
+</html>
+
